@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TradeTable from './components/TradeTable.vue'
+import TradeTable from '../components/TradeTable.vue'
 </script>
 
 <template>

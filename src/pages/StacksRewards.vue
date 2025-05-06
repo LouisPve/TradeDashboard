@@ -6,65 +6,68 @@
 
     <div v-if="error" class="error">{{ error }}</div>
 
-    <div v-if="openTrades" class="content">
-      <table v-if="openTrades.length" class="trade-table">
+    <div v-if="rewards" class="content">
+      <table v-if="rewards.length" class="trade-table">
         <thead>
           <tr>
-            <th></th>
-            <th>Symbol</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>PNL</th>
-            <th>Action</th>
+            <th>Cycle</th>
+            <th>Start Balance</th>
+            <th>End Balance</th>
+            <th>BTC Yield</th>
+            <th>Period Yield</th>
+            <th>Annualized Yield</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(trade, index) in openTrades" :key="index">
+          <tr v-for="(reward, index) in rewards" :key="index">
+            <td>{{ reward.cycleId }}</td>
+            <td>{{ formatReward(reward.snapshots[0]) }} BTC</td>
             <td>
-              <router-link :to="{ name: 'trade', params: { id: trade?.id } }" v-bind="trade">
-                +
-              </router-link>
+              {{
+                reward.rewarded
+                  ? formatReward(reward.snapshots[reward.snapshots.length - 1]) + ' BTC'
+                  : ''
+              }}
             </td>
-            <td>{{ trade.symbol }}</td>
-            <td>{{ trade.quantity }}</td>
-            <td>{{ trade.price }}</td>
-            <td>{{ trade.pnl?.toFixed(2) }}</td>
+            <td>{{ formatReward(reward?.rewarded ?? 0) }} BTC</td>
             <td>
-              <button @click="closeTrade(index)">Close</button>
+              {{
+                reward.rewarded
+                  ? (
+                      (reward.rewarded / reward.snapshots[reward.snapshots.length - 1]) *
+                      100
+                    ).toFixed(2) + '%'
+                  : ''
+              }}
             </td>
+            <td>{{ '' }}</td>
           </tr>
           <tr>
             <td>Total</td>
             <td></td>
             <td></td>
-            <td>{{ totalPnl }}</td>
+            <td>{{ formatReward(totalRewards) }} BTC</td>
             <td></td>
             <td></td>
           </tr>
         </tbody>
       </table>
-      <p v-else-if="!openTrades.length && !loading">No open trades available.</p>
+      <p v-else-if="!rewards.length && !loading">No rewards available.</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { getTrades, type Trade } from '../adapters/trade'
+import { getStacksRewards, type StacksReward } from '../adapters/stacks'
 
-const openTrades = ref([] as Trade[])
+const rewards = ref([] as StacksReward[])
 
 const loading = ref(false)
 const error = ref(null as Error | null)
-const totalPnl = computed(() => {
-  return openTrades.value.reduce((acc, trade) => acc + (trade.pnl ?? 0), 0).toFixed(2)
+const totalRewards = computed(() => {
+  return rewards.value.reduce((acc, reward) => acc + (reward.rewarded ?? 0), 0)
 })
-
-function refreshTrades() {
-  openTrades.value.forEach((trade) => {
-    trade.pnl = (trade.pnl ?? 0) * (1 + Math.random() * 0.1) // Simulate random pnl change
-  })
-}
 
 onMounted(async () => {
   error.value = null
@@ -72,11 +75,7 @@ onMounted(async () => {
 
   try {
     // replace `getPost` with your data fetching util / API wrapper
-    const trades = await getTrades()
-    openTrades.value = trades
-    setInterval(() => {
-      refreshTrades()
-    }, 3000) // Refresh every 5 seconds
+    rewards.value = await getStacksRewards()
   } catch (err) {
     error.value = err as Error
     console.error('Error fetching trades:', error.value.message)
@@ -85,8 +84,8 @@ onMounted(async () => {
   }
 })
 
-function closeTrade(index: number) {
-  openTrades.value.splice(index, 1)
+function formatReward(reward: number) {
+  return (reward * 10 ** -8).toFixed(8)
 }
 </script>
 

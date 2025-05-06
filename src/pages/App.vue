@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { capitalize } from '../utils/string.utils'
 
 const route = useRoute()
 
@@ -18,15 +19,17 @@ const breadcrumbs = computed(() => {
 
 <template>
   <nav>
-    <h1>Hello App!</h1>
-    <RouterLink to="/trade">Go to Home</RouterLink>
+    <h1><RouterLink to="/trade">AllMyInvest</RouterLink></h1>
+    <RouterLink to="/trade">Trades</RouterLink>
+    <RouterLink to="/stacks">Bitcoin stacking</RouterLink>
+    <RouterLink to="/aave">Aave</RouterLink>
     <RouterLink to="/about">Go to About</RouterLink>
   </nav>
   <div class="breadcrumbs">
     <p>
-      <strong>Ariadne's thread:</strong>
+      @>
       <span v-for="(crumb, index) in breadcrumbs" :key="crumb.path">
-        <RouterLink :to="crumb.path">{{ crumb.name }}</RouterLink>
+        <RouterLink :to="crumb.path">{{ capitalize(crumb.name) }}</RouterLink>
         <span v-if="index < breadcrumbs.length - 1"> &gt; </span>
       </span>
     </p>
