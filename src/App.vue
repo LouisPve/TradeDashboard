@@ -19,7 +19,7 @@ const breadcrumbs = computed(() => {
 <template>
   <nav>
     <h1>Hello App!</h1>
-    <RouterLink to="/">Go to Home</RouterLink>
+    <RouterLink to="/trade">Go to Home</RouterLink>
     <RouterLink to="/about">Go to About</RouterLink>
   </nav>
   <div class="breadcrumbs">

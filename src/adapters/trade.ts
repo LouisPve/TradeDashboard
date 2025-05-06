@@ -1,4 +1,4 @@
-export interface Trade {
+export declare interface Trade {
   id: number
   symbol: string
   price: number
@@ -10,7 +10,7 @@ export interface Trade {
 export async function getTrades(): Promise<Trade[]> {
   // Simulate an API call to fetch trades
   // In a real-world scenario, you would replace this with an actual API call
-  await new Promise((resolve) => setTimeout(resolve, 3000))
+  await new Promise((resolve) => setTimeout(resolve, 500))
   return Promise.resolve([
     {
       id: 1,
@@ -37,4 +37,11 @@ export async function getTrades(): Promise<Trade[]> {
       date: '2023-10-03',
     },
   ])
+}
+
+export function findTrade(id: number): Promise<Trade | null> {
+  return getTrades().then((trades) => {
+    const trade = trades.find((trade) => trade.id === id)
+    return trade || null
+  })
 }

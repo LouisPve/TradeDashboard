@@ -10,6 +10,7 @@
       <table v-if="openTrades.length" class="trade-table">
         <thead>
           <tr>
+            <th></th>
             <th>Symbol</th>
             <th>Quantity</th>
             <th>Price</th>
@@ -19,6 +20,11 @@
         </thead>
         <tbody>
           <tr v-for="(trade, index) in openTrades" :key="index">
+            <td>
+              <router-link :to="{ name: 'trade', params: { id: trade?.id } }" v-bind="trade">
+                +
+              </router-link>
+            </td>
             <td>{{ trade.symbol }}</td>
             <td>{{ trade.quantity }}</td>
             <td>{{ trade.price }}</td>
@@ -32,6 +38,8 @@
             <td></td>
             <td></td>
             <td>{{ totalPnl }}</td>
+            <td></td>
+            <td></td>
           </tr>
         </tbody>
       </table>
