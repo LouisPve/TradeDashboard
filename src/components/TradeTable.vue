@@ -13,6 +13,7 @@
             <th>Symbol</th>
             <th>Quantity</th>
             <th>Price</th>
+            <th>PNL</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -21,9 +22,16 @@
             <td>{{ trade.symbol }}</td>
             <td>{{ trade.quantity }}</td>
             <td>{{ trade.price }}</td>
+            <td>{{ trade.pnl?.toFixed(2) }}</td>
             <td>
               <button @click="closeTrade(index)">Close</button>
             </td>
+          </tr>
+          <tr>
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <td>{{ totalPnl }}</td>
           </tr>
         </tbody>
       </table>
@@ -33,13 +41,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getTrades, type Trade } from '../adapters/trade'
 
 const openTrades = ref([] as Trade[])
 
 const loading = ref(false)
 const error = ref(null as Error | null)
+const totalPnl = computed(() => {
+  return openTrades.value.reduce((acc, trade) => acc + (trade.pnl ?? 0), 0).toFixed(2)
+})
+
+function refreshTrades() {
+  openTrades.value.forEach((trade) => {
+    trade.pnl = (trade.pnl ?? 0) * (1 + Math.random() * 0.1) // Simulate random pnl change
+  })
+}
 
 onMounted(async () => {
   error.value = null
@@ -49,6 +66,9 @@ onMounted(async () => {
     // replace `getPost` with your data fetching util / API wrapper
     const trades = await getTrades()
     openTrades.value = trades
+    setInterval(() => {
+      refreshTrades()
+    }, 3000) // Refresh every 5 seconds
   } catch (err) {
     error.value = err as Error
     console.error('Error fetching trades:', error.value.message)

@@ -4,6 +4,7 @@ export interface Trade {
   price: number
   quantity: number
   date: string
+  pnl?: number
 }
 
 export async function getTrades(): Promise<Trade[]> {
@@ -16,6 +17,7 @@ export async function getTrades(): Promise<Trade[]> {
       symbol: 'AAPL',
       price: 150.0,
       quantity: 10,
+      pnl: 1,
       date: '2023-10-01',
     },
     {
@@ -23,6 +25,7 @@ export async function getTrades(): Promise<Trade[]> {
       symbol: 'GOOGL',
       price: 2800.0,
       quantity: 5,
+      pnl: 3,
       date: '2023-10-02',
     },
     {
@@ -30,6 +33,7 @@ export async function getTrades(): Promise<Trade[]> {
       symbol: 'AMZN',
       price: 3400.0,
       quantity: 2,
+      pnl: -2,
       date: '2023-10-03',
     },
   ])
